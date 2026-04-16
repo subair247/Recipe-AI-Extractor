@@ -1,0 +1,9 @@
+Act as a Nutritionist and Meal Planner. 
+Given the following recipes:
+{recipes_list}
+
+1. Create a 3-day meal plan using these recipes.
+2. Generate a combined shopping list, grouping similar items together (e.g., all vegetables in one section).
+3. Suggest a 'Chef's Tip' for prepping these ingredients in advance to save time.
+
+Return the response in a structured JSON format.

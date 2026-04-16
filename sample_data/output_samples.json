@@ -1,0 +1,31 @@
+[
+  {
+    "url": "https://www.allrecipes.com/recipe/23891/grilled-cheese-sandwich/",
+    "title": "Classic Grilled Cheese Sandwich",
+    "cuisine": "American",
+    "prep_time": "5 mins",
+    "difficulty": "easy",
+    "ingredients": [
+      { "quantity": "2", "unit": "slices", "item": "white bread" },
+      { "quantity": "1", "unit": "slice", "item": "American cheese" },
+      { "quantity": "1", "unit": "tbsp", "item": "butter" }
+    ],
+    "instructions": [
+      "Preheat skillet over medium heat.",
+      "Butter one side of each bread slice.",
+      "Place cheese between unbuttered sides.",
+      "Grill until golden brown on both sides."
+    ],
+    "nutrition_estimate": {
+      "calories": "350",
+      "protein": "10g",
+      "carbs": "30g",
+      "fat": "22g"
+    },
+    "substitutions": [
+      "Use sourdough for a tangier flavor.",
+      "Swap American cheese with Sharp Cheddar.",
+      "Use olive oil spread for a lower saturated fat option."
+    ]
+  }
+]
