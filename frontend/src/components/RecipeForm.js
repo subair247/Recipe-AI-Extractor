@@ -1,48 +1,70 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
-const RecipeForm = ({ onExtractionSuccess }) => {
-  const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
+const RecipeForm = ({ setRecipes }) => {
+    const [url, setUrl] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // Clean API call to your live Render backend
-      const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
-      
-      // Pass the data back to App.js
-      onExtractionSuccess(response.data); 
-    } catch (error) {
-      console.error("Error details:", error);
-      alert("Extraction failed. Make sure the backend is running and CORS is enabled!");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleExtract = async (e) => {
+        e.preventDefault();
+        if (!url) {
+            toast.error("Please paste a URL first!");
+            return;
+        }
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border">
-      <h2 className="text-lg font-semibold mb-4">Recipe Source</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input 
-          type="url" 
-          required
-          placeholder="https://allrecipes.com/recipe/..."
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <button 
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-        >
-          {loading ? "Scraping & Analyzing..." : "Extract Recipe"}
-        </button>
-      </form>
-    </div>
-  );
+        setLoading(true);
+        const loadingToast = toast.loading("AI is analyzing the recipe...");
+
+        try {
+            const response = await axios.post(
+                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+                { url }
+            );
+
+            // Check if the backend used the fallback logic
+            if (response.data.title === "Lemon Garlic Chicken Piccata") {
+                toast.dismiss(loadingToast);
+                toast.error("Site blocked access. Showing sample recipe.", {
+                    duration: 5000,
+                    icon: '⚠️',
+                });
+            } else {
+                toast.dismiss(loadingToast);
+                toast.success("Recipe extracted successfully!");
+            }
+
+            setRecipes(response.data);
+        } catch (error) {
+            toast.dismiss(loadingToast);
+            toast.error("Connection failed. Check if the backend is live.");
+            console.error("Extraction Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="form-container">
+            <Toaster position="top-right" reverseOrder={false} />
+            <form onSubmit={handleExtract}>
+                <input
+                    type="text"
+                    placeholder="Paste recipe URL here (e.g., AllRecipes, SimplyRecipes)..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    disabled={loading}
+                />
+                <button type="submit" disabled={loading} className={loading ? "loading-btn" : ""}>
+                    {loading ? (
+                        <span className="spinner-text">AI is thinking...</span>
+                    ) : (
+                        "Extract Recipe"
+                    )}
+                </button>
+            </form>
+        </div>
+    );
 };
 
 export default RecipeForm;
