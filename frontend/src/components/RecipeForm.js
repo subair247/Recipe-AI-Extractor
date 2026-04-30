@@ -7,38 +7,48 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const loadToast = toast.loading("AI is analyzing the recipe...");
+    e.preventDefault();
+    setLoading(true);
+    setRecipes(null); // Clear old data
+    const loadToast = toast.loading("AI is analyzing...");
 
-        try {
-            // Ensure the URL matches your active Render service
-            const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
-            
-            // 1. Clear the loading toast immediately
-            toast.dismiss(loadToast);
+    try {
+        // 1. Increased timeout to 30 seconds to prevent "fake" connection errors
+        const response = await axios.post(
+            'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+            { url },
+            { timeout: 30000 } 
+        );
+        
+        toast.dismiss(loadToast);
+
+        // 2. If we have data, USE IT immediately
+        if (response.data) {
             setRecipes(response.data);
-
-            // 2. Check if the response is one of our fallback recipes
-            const isFallback = [
-                "Lemon Garlic Chicken Piccata", 
-                "Bakery-Style Chocolate Chip Cookies",
-                "Old Fashioned Apple Pie"
-            ].includes(response.data.title);
-
-            if (isFallback) {
-                toast.error("Site blocked access. Showing sample recipe.", { icon: '⚠️', duration: 4000 });
+            
+            // Check if it's a fallback recipe
+            const fallbacks = ["Bakery-Style Chocolate Chip Cookies", "Lemon Garlic Chicken Piccata", "Old Fashioned Apple Pie"];
+            if (fallbacks.includes(response.data.title)) {
+                toast.error("Site blocked. Using smart fallback.", { icon: '⚠️' });
             } else {
-                toast.success("Recipe extracted successfully!");
+                toast.success("Extraction successful!");
             }
-        } catch (error) {
-            toast.dismiss(loadToast);
-            // This only triggers if the backend server itself is down
-            toast.error("Connection failed. Check if the backend is live.");
-        } finally {
-            setLoading(false);
         }
-    };
+    } catch (error) {
+        toast.dismiss(loadToast);
+        
+        // 3. Even if Axios "fails", check if we got data anyway (Render sometimes does this)
+        if (error.response && error.response.data) {
+            setRecipes(error.response.data);
+            toast.error("Offline mode activated.");
+        } else {
+            console.error("Actual Error:", error);
+            toast.error("Server is waking up. Please click again in 10 seconds.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="form-container">
