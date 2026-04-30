@@ -16,16 +16,15 @@ const RecipeForm = ({ setRecipes }) => {
             { timeout: 60000 }
         );
         
-        // This is the only part that matters: setting the data
+        // This is the line that makes the output visible
         if (response && response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        // If the backend sends the fallback (like Apple Pie) inside an error response
+        // Even if there is an error status, check for the Apple Pie data
         if (error.response && error.response.data) {
             setRecipes(error.response.data);
-        } 
-        // We are NOT adding a console.error here because that is where your current code is crashing
+        }
     } finally {
         setLoading(false);
     }
