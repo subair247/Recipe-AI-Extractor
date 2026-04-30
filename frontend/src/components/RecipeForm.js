@@ -7,48 +7,36 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-        e.preventDefault();
-        if (!url) return toast.error("Please paste a URL");
+    e.preventDefault();
+    if (!url) return alert("Please paste a URL");
 
-        setLoading(true);
-        // Using a simple string ID to avoid object reference errors
-        const toastId = "loading-toast"; 
-        toast.loading("AI is analyzing...", { id: toastId });
+    setLoading(true);
+    console.log("Starting extraction for:", url);
 
-        try {
-            const response = await axios.post(
-                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-                { url },
-                { timeout: 40000 } // Extra time for Render's free tier
-            );
-            
-            toast.dismiss(toastId);
-
-            if (response.data) {
-                setRecipes(response.data);
-                
-                // Check if it's one of our fallback titles
-                const fallbacks = ["Bakery-Style Chocolate Chip Cookies", "Lemon Garlic Chicken Piccata", "Old Fashioned Apple Pie"];
-                if (fallbacks.includes(response.data.title)) {
-                    toast("Site blocked. Using smart fallback.", { icon: '⚠️' });
-                } else {
-                    toast.success("Extraction successful!");
-                }
-            }
-        } catch (error) {
-            toast.dismiss(toastId);
-            console.error("Full Error Object:", error);
-
-            if (error.response && error.response.data) {
-                setRecipes(error.response.data);
-                toast("Server busy. Showing sample recipe.", { icon: 'ℹ️' });
-            } else {
-                toast.error("Please click Extract again in 5 seconds.");
-            }
-        } finally {
-            setLoading(false);
+    try {
+        const response = await axios.post(
+            'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+            { url },
+            { timeout: 45000 } 
+        );
+        
+        if (response.data) {
+            console.log("Success! Data received:", response.data);
+            setRecipes(response.data);
+            toast.success("Recipe extracted!");
         }
-    };
+    } catch (error) {
+        console.error("Extraction Error:", error);
+        if (error.response && error.response.data) {
+            setRecipes(error.response.data);
+            toast.error("Using fallback data.");
+        } else {
+            alert("The server is still waking up. Please wait 10 seconds and click again.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="form-container">
