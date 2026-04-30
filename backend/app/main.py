@@ -1,15 +1,16 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from pydantic import BaseModel
 from app.scraper import scrape_recipe_url
 from app.llm_handler import extract_structured_data
-from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
-# This is CRITICAL for the Frontend to talk to the Backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # This allows your Vercel frontend to talk to Render
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
