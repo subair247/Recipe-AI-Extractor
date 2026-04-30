@@ -7,28 +7,26 @@ const RecipeForm = ({ setRecipes }) => {
 
     const handleExtract = async (e) => {
     e.preventDefault();
-    if (!url) return alert("Please paste a URL first");
-
     setLoading(true);
-    // Removed toast.loading to stop the 't is not a function' error
-    
+
     try {
         const response = await axios.post(
             'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
             { url },
-            { timeout: 50000 } // Extended timeout for Render's free tier
+            { timeout: 60000 } // Accounts for Render's 50s spin-up time
         );
         
-        if (response && response.data) {
+        // If we reach here, simply set the data
+        if (response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        console.error("Extraction Error:", error);
-        // Handle fallback data if the server sent it
+        // This is the CRITICAL fix: check for data even if there is an error status
         if (error.response && error.response.data) {
+            console.log("Rendering fallback data received from server");
             setRecipes(error.response.data);
         } else {
-            alert("The server is still starting up. Please wait 10 seconds and try again.");
+            console.error("Backend truly unreachable", error);
         }
     } finally {
         setLoading(false);
