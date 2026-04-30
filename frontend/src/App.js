@@ -17,7 +17,11 @@ function App() {
     console.log("Data received in App.js:", data);
     
     // 1. Show on current card
-    setCurrentRecipe(data); 
+    setCurrentRecipe(null); 
+
+    setTimeout(() => {
+      setCurrentRecipe(data); 
+    }, 10);
 
     // 2. SAVE TO HISTORY: Add the new data to our list
     setHistoryList((prev) => [data, ...prev]); 
