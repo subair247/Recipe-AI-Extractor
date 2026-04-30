@@ -13,7 +13,7 @@ const RecipeForm = ({ setRecipes }) => {
             const response = await axios.post(
                 'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
                 { url },
-                { timeout: 45000 }
+                { timeout: 60000 }
             );
             
             // If we get ANY response from our backend, set the data
