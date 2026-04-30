@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
+console.log("API URL:", import.meta.env.VITE_API_URL);
 const RecipeForm = (props) => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
