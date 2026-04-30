@@ -10,7 +10,7 @@ export const useRecipes = () => {
         setError(null);
         try {
             // Points to your Python FastAPI backend
-            const response = await axios.post('http://localhost:8000/extract-recipe', { url });
+            const response = await axios.post('https://recipe-ai-extractor.onrender.com-recipe', { url });
             return response.data;
         } catch (err) {
             const message = err.response?.data?.detail || "Could not connect to the server.";

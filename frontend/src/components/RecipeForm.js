@@ -10,7 +10,7 @@ const RecipeForm = ({ onExtractionSuccess }) => {
     setLoading(true);
     try {
       // Inside RecipeForm.js
-      const response = await axios.post('http://localhost:8000/extract-recipe', { url });
+      const response = await axios.post('https://recipe-ai-extractor.onrender.com-recipe', { url });
       onExtractionSuccess(response.data); // <--- This MUST match the prop name in App.js
     } catch (error) {
       alert("Extraction failed. Make sure the backend is running!");
