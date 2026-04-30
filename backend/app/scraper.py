@@ -7,14 +7,19 @@ SCRAPER_API_KEY = os.getenv("SCRAPER_API_KEY")
 
 
 def fetch_html(url):
-    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={url}"
+    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={url}&render=true"
 
     response = requests.get(proxy_url, timeout=30)
 
     if response.status_code != 200:
         raise Exception(f"ScraperAPI failed: {response.status_code}")
 
-    return response.text
+    html = response.text
+
+
+    print("HTML LENGTH:", len(html))
+
+    return html
 
 
 def extract_json_ld(soup):
