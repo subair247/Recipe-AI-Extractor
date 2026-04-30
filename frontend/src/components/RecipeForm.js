@@ -7,36 +7,32 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const loadToast = toast.loading("AI is analyzing the recipe...");
+    e.preventDefault();
+    setLoading(true);
+    const loadToast = toast.loading("AI is analyzing the recipe...");
 
-        try {
-            // Using the -1 service as seen in your Render dashboard
-            const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
-            
-            setRecipes(response.data);
-            toast.dismiss(loadToast);
+    try {
+        const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
+        
+        // 1. Success! Clear the loading state first
+        toast.dismiss(loadToast);
+        setRecipes(response.data);
 
-            // Notify if we used a fallback due to site blocking
-            if (response.data.title === "Lemon Garlic Chicken Piccata") {
-                toast.error("Site blocked access. Showing sample recipe.", { icon: '⚠️', duration: 5000 });
-            } else {
-                toast.success("Recipe extracted!");
-            }
-        } catch (error) {
-            toast.dismiss(loadToast);
-            // If backend is waking up or 402 occurred but returned data
-            if (error.response && error.response.data) {
-                setRecipes(error.response.data);
-                toast.error("Using offline fallback mode.");
-            } else {
-                toast.error("Connection failed. Try again in 30 seconds.");
-            }
-        } finally {
-            setLoading(false);
+        // 2. Now check if it was a fallback or real extraction
+        if (response.data.title === "Lemon Garlic Chicken Piccata" || 
+            response.data.title === "Bakery-Style Chocolate Chip Cookies") {
+            toast.error("Site blocked access. Showing sample recipe.", { icon: '⚠️', duration: 4000 });
+        } else {
+            toast.success("Recipe extracted successfully!");
         }
-    };
+    } catch (error) {
+        toast.dismiss(loadToast);
+        // This only runs if the SERVER is down, not if the scraping fails
+        toast.error("Connection failed. Check if the backend is live.");
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="form-container">
