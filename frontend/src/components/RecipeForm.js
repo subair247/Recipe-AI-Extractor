@@ -3,14 +3,19 @@ import axios from "axios";
 
 const API_URL = "https://recipe-ai-extractor-1.onrender.com";
 
-const RecipeForm = ({ onExtractionSuccess }) => {
+const RecipeForm = (props) => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleExtract = async (e) => {
     e.preventDefault();
 
-    console.log("onExtractionSuccess:", onExtractionSuccess);
+    console.log("PROPS:", props);
+
+    if (!props.onExtractionSuccess) {
+      console.error("onExtractionSuccess is missing!");
+      return;
+    }
 
     if (!url) return;
 
@@ -24,11 +29,13 @@ const RecipeForm = ({ onExtractionSuccess }) => {
       );
 
       if (response.data?.success) {
-        onExtractionSuccess(response.data.data);
+        props.onExtractionSuccess(response.data.data);
+      } else {
+        throw new Error("Invalid response");
       }
 
     } catch (err) {
-      console.error(err);
+      console.error("API ERROR:", err);
     } finally {
       setLoading(false);
     }
@@ -39,8 +46,11 @@ const RecipeForm = ({ onExtractionSuccess }) => {
       <input
         value={url}
         onChange={(e) => setUrl(e.target.value)}
+        placeholder="Enter recipe URL"
       />
-      <button type="submit">Extract</button>
+      <button type="submit">
+        {loading ? "Loading..." : "Extract"}
+      </button>
     </form>
   );
 };
