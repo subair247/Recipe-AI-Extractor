@@ -1,74 +1,74 @@
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, HttpUrl
-from app.scraper import scrape_recipe_url
-from app.llm_handler import extract_structured_data
-
+from pydantic import BaseModel
+import requests
 
 app = FastAPI()
 
-
-# ✅ CORS (keep frontend access open for now)
+# CORS (keep this)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict later
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# ✅ Validate URL properly
+# Request model (keep same)
 class RecipeRequest(BaseModel):
-    url: HttpUrl
+    url: str  # now this will be used as a search query
 
 
-# ✅ Health check route (important for testing)
-@app.get("/")
-def root():
-    return {"status": "API is running"}
+# 🔥 NEW: Fetch recipe from API (no scraping)
+def fetch_recipe_from_api(query: str):
+    api_url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={query}"
+
+    response = requests.get(api_url)
+
+    if response.status_code != 200:
+        return {"error": "Failed to fetch recipe from API"}
+
+    data = response.json()
+
+    if not data.get("meals"):
+        return {"error": "No recipe found"}
+
+    meal = data["meals"][0]
+
+    # Extract ingredients
+    ingredients = []
+    for i in range(1, 21):
+        ing = meal.get(f"strIngredient{i}")
+        measure = meal.get(f"strMeasure{i}")
+
+        if ing and ing.strip():
+            ingredients.append(f"{measure} {ing}".strip())
+
+    # Extract instructions
+    instructions = meal.get("strInstructions", "")
+    steps = [step.strip() for step in instructions.split(".") if step.strip()]
+
+    return {
+        "title": meal.get("strMeal"),
+        "cuisine": meal.get("strArea"),
+        "ingredients": ingredients,
+        "instructions": steps,
+        "image": meal.get("strMealThumb"),
+    }
 
 
-# ✅ Main API
+# 🔥 UPDATED endpoint
 @app.post("/extract-recipe")
 async def extract_recipe(request: RecipeRequest):
     try:
-        # 🔴 STEP 1: Scrape recipe page
-        recipe_text = scrape_recipe_url(str(request.url))
-
-        if not recipe_text:
-            raise HTTPException(
-                status_code=502,
-                detail="Failed to fetch recipe content (blocked or empty)"
-            )
-
-        if isinstance(recipe_text, str) and recipe_text.startswith("Error"):
-            raise HTTPException(status_code=502, detail=recipe_text)
-
-        # 🔴 STEP 2: Extract structured data using LLM
-        structured_data = extract_structured_data(
-            recipe_text,
-            str(request.url)
-        )
-
-        if not structured_data:
-            raise HTTPException(
-                status_code=500,
-                detail="AI failed to extract recipe data"
-            )
-
-        # ✅ SUCCESS RESPONSE (matches frontend expectation)
-        return {
-            "success": True,
-            "data": structured_data
-        }
-
-    except HTTPException as http_err:
-        raise http_err
-
+        query = request.url  # user types "chicken curry"
+        data = fetch_recipe_from_api(query)
+        return data
     except Exception as e:
-        print(f"Unexpected error: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Internal server error"
-        )
+        return {"error": str(e)}
+
+
+# Optional root route (for testing)
+@app.get("/")
+def read_root():
+    return {"status": "API is running"}
