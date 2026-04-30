@@ -9,11 +9,14 @@ const RecipeForm = ({ onExtractionSuccess }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Inside RecipeForm.js
-      const response = await axios.post('https://recipe-ai-extractor.onrender.com-recipe', { url });
-      onExtractionSuccess(response.data); // <--- This MUST match the prop name in App.js
+      // Clean API call to your live Render backend
+      const response = await axios.post('https://recipe-ai-extractor.onrender.com/extract-recipe', { url });
+      
+      // Pass the data back to App.js
+      onExtractionSuccess(response.data); 
     } catch (error) {
-      alert("Extraction failed. Make sure the backend is running!");
+      console.error("Error details:", error);
+      alert("Extraction failed. Make sure the backend is running and CORS is enabled!");
     } finally {
       setLoading(false);
     }
@@ -33,7 +36,7 @@ const RecipeForm = ({ onExtractionSuccess }) => {
         />
         <button 
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
         >
           {loading ? "Scraping & Analyzing..." : "Extract Recipe"}
         </button>
