@@ -10,35 +10,31 @@ const RecipeForm = ({ onExtractionSuccess }) => {
 
   const handleExtract = async (e) => {
     e.preventDefault();
-
-    if (!query.trim()) {
-      alert("Please enter a recipe name");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${API_URL}/extract-recipe`,
-        { url: query }, // backend still expects "url" field
-        { timeout: 30000 }
-      );
-
-      console.log("API RESPONSE:", response.data);
-
-      if (response.data && !response.data.error) {
-        onExtractionSuccess(response.data);
-      } else {
-        alert(response.data.error || "No recipe found");
-      }
+        // Hardcode the Render URL here to fix the "undefined" error instantly
+        const response = await axios.post(
+            'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+            { url },
+            { timeout: 60000 }
+        );
+        
+        if (response.data) {
+            setRecipes(response.data);
+        }
     } catch (error) {
-      console.error("API ERROR:", error);
-      alert("Failed to fetch recipe. Check backend or try again.");
+        // If it's a 402/CORS error, check for fallback data
+        if (error.response && error.response.data) {
+            setRecipes(error.response.data);
+        } else {
+            console.error("API Error:", error);
+            alert("The server is still waking up. Please click again in 10 seconds.");
+        }
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   return (
     <div className="form-container">
