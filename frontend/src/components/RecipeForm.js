@@ -23,10 +23,10 @@ const RecipeForm = ({ setRecipes }) => {
     } catch (error) {
         // This is the CRITICAL fix: check for data even if there is an error status
         if (error.response && error.response.data) {
-            console.log("Rendering fallback data received from server");
+            console.log("Found fallback data in error response. Displaying now...");
             setRecipes(error.response.data);
         } else {
-            console.error("Backend truly unreachable", error);
+            console.error("Actual network failure:", error);
         }
     } finally {
         setLoading(false);
