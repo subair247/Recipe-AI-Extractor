@@ -35,9 +35,12 @@ body {
 }
 
 .form-container input:focus {
-  border-color: var(--primary-blue);
-  ring: 2px var(--primary-blue);
+    border-color: var(--primary-blue);
+    /* Standard CSS replacement for the Tailwind 'ring' effect */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); 
 }
+
 
 .form-container button {
   min-width: 160px; /* Prevents button from jumping when text changes */
