@@ -6,32 +6,34 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    e.preventDefault();
+    setLoading(true);
+    setRecipes(null); // Clear old display
 
-        try {
-            const response = await axios.post(
-                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-                { url },
-                { timeout: 60000 }
-            );
-            
-            // If we get ANY response from our backend, set the data
-            if (response.data) {
-                setRecipes(response.data);
-            }
-        } catch (error) {
-            // Even on error, check if the backend sent the fallback data
-            if (error.response && error.response.data) {
-                setRecipes(error.response.data);
-            } else {
-                console.error("Backend unreachable");
-            }
-        } finally {
-            setLoading(false);
+    try {
+        const response = await axios.post(
+            'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+            { url },
+            { timeout: 60000 } // Extended timeout for Render spin-up
+        );
+        
+        // If the code reaches here, it's a standard success
+        if (response.data) {
+            setRecipes(response.data);
         }
-    };
-
+    } catch (error) {
+        // IMPORTANT: Check if the backend sent fallback data despite the 'error' status
+        if (error.response && error.response.data) {
+            console.log("Using Fallback Data:", error.response.data);
+            setRecipes(error.response.data);
+        } else {
+            console.error("True Connection Error:", error);
+            alert("Server is waking up. Please click again in 10 seconds.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
     return (
         <div className="form-container">
             <form onSubmit={handleExtract}>
