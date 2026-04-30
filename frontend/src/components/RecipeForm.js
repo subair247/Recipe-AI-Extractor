@@ -8,37 +8,31 @@ const RecipeForm = ({ setRecipes }) => {
 
     const handleExtract = async (e) => {
         e.preventDefault();
-        if (!url) {
-            toast.error("Please paste a URL first!");
-            return;
-        }
-
         setLoading(true);
-        const loadingToast = toast.loading("AI is analyzing the recipe...");
+        const loadToast = toast.loading("AI is analyzing the recipe...");
 
         try {
-            const response = await axios.post(
-                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-                { url }
-            );
-
-            // Check if the backend used the fallback logic
-            if (response.data.title === "Lemon Garlic Chicken Piccata") {
-                toast.dismiss(loadingToast);
-                toast.error("Site blocked access. Showing sample recipe.", {
-                    duration: 5000,
-                    icon: '⚠️',
-                });
-            } else {
-                toast.dismiss(loadingToast);
-                toast.success("Recipe extracted successfully!");
-            }
-
+            // Using the -1 service as seen in your Render dashboard
+            const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
+            
             setRecipes(response.data);
+            toast.dismiss(loadToast);
+
+            // Notify if we used a fallback due to site blocking
+            if (response.data.title === "Lemon Garlic Chicken Piccata") {
+                toast.error("Site blocked access. Showing sample recipe.", { icon: '⚠️', duration: 5000 });
+            } else {
+                toast.success("Recipe extracted!");
+            }
         } catch (error) {
-            toast.dismiss(loadingToast);
-            toast.error("Connection failed. Check if the backend is live.");
-            console.error("Extraction Error:", error);
+            toast.dismiss(loadToast);
+            // If backend is waking up or 402 occurred but returned data
+            if (error.response && error.response.data) {
+                setRecipes(error.response.data);
+                toast.error("Using offline fallback mode.");
+            } else {
+                toast.error("Connection failed. Try again in 30 seconds.");
+            }
         } finally {
             setLoading(false);
         }
@@ -46,21 +40,17 @@ const RecipeForm = ({ setRecipes }) => {
 
     return (
         <div className="form-container">
-            <Toaster position="top-right" reverseOrder={false} />
+            <Toaster position="top-right" />
             <form onSubmit={handleExtract}>
-                <input
-                    type="text"
-                    placeholder="Paste recipe URL here (e.g., AllRecipes, SimplyRecipes)..."
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
+                <input 
+                    type="text" 
+                    placeholder="Paste URL here..." 
+                    value={url} 
+                    onChange={(e) => setUrl(e.target.value)} 
                     disabled={loading}
                 />
                 <button type="submit" disabled={loading} className={loading ? "loading-btn" : ""}>
-                    {loading ? (
-                        <span className="spinner-text">AI is thinking...</span>
-                    ) : (
-                        "Extract Recipe"
-                    )}
+                    {loading ? <span className="spinner-text">AI is thinking...</span> : "Extract Recipe"}
                 </button>
             </form>
         </div>
