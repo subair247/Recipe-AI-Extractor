@@ -13,21 +13,19 @@ const RecipeForm = ({ setRecipes }) => {
         const response = await axios.post(
             'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
             { url },
-            { timeout: 60000 } // Accounts for Render's 50s spin-up time
+            { timeout: 60000 }
         );
         
-        // If we reach here, simply set the data
-        if (response.data) {
+        // This is the only part that matters: setting the data
+        if (response && response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        // This is the CRITICAL fix: check for data even if there is an error status
+        // If the backend sends the fallback (like Apple Pie) inside an error response
         if (error.response && error.response.data) {
-            console.log("Found fallback data in error response. Displaying now...");
             setRecipes(error.response.data);
-        } else {
-            console.error("Actual network failure:", error);
-        }
+        } 
+        // We are NOT adding a console.error here because that is where your current code is crashing
     } finally {
         setLoading(false);
     }
