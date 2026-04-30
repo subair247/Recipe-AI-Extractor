@@ -10,26 +10,27 @@ const RecipeForm = ({ onExtractionSuccess }) => {
 
   const handleExtract = async (e) => {
     e.preventDefault();
+    if (!url) return;
+
     setLoading(true);
 
     try {
-        // Hardcode the Render URL here to fix the "undefined" error instantly
+        // We are using the direct string here to stop the 'undefined' error forever
         const response = await axios.post(
             'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
             { url },
-            { timeout: 60000 }
+            { timeout: 60000 } // Long timeout for Render's free tier spin-up
         );
         
-        if (response.data) {
+        if (response && response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        // If it's a 402/CORS error, check for fallback data
+        // Handle the scraper block or CORS issue by showing the fallback data
         if (error.response && error.response.data) {
             setRecipes(error.response.data);
         } else {
-            console.error("API Error:", error);
-            alert("The server is still waking up. Please click again in 10 seconds.");
+            console.error("Connection failed:", error);
         }
     } finally {
         setLoading(false);
