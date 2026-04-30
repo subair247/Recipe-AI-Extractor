@@ -10,7 +10,7 @@ const RecipeForm = ({ onExtractionSuccess }) => {
     setLoading(true);
     try {
       // Clean API call to your live Render backend
-      const response = await axios.post('https://recipe-ai-extractor.onrender.com/extract-recipe', { url });
+      const response = await axios.post('https://recipe-ai-extractor-1.onrender.com/extract-recipe', { url });
       
       // Pass the data back to App.js
       onExtractionSuccess(response.data); 
