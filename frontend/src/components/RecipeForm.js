@@ -7,33 +7,34 @@ const RecipeForm = ({ setRecipes }) => {
 
     const handleExtract = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setRecipes(null); // Clear old display
+    if (!url) return alert("Please paste a URL first");
 
+    setLoading(true);
+    // Removed toast.loading to stop the 't is not a function' error
+    
     try {
         const response = await axios.post(
             'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
             { url },
-            { timeout: 60000 } // Extended timeout for Render spin-up
+            { timeout: 50000 } // Extended timeout for Render's free tier
         );
         
-        // If the code reaches here, it's a standard success
-        if (response.data) {
+        if (response && response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        // IMPORTANT: Check if the backend sent fallback data despite the 'error' status
+        console.error("Extraction Error:", error);
+        // Handle fallback data if the server sent it
         if (error.response && error.response.data) {
-            console.log("Using Fallback Data:", error.response.data);
             setRecipes(error.response.data);
         } else {
-            console.error("True Connection Error:", error);
-            alert("Server is waking up. Please click again in 10 seconds.");
+            alert("The server is still starting up. Please wait 10 seconds and try again.");
         }
     } finally {
         setLoading(false);
     }
 };
+
     return (
         <div className="form-container">
             <form onSubmit={handleExtract}>
