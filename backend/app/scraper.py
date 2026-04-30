@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import os
 
-SCRAPER_API_KEY = "9683bbfd7fd19df9cc0dad1568bf6b83"
+SCRAPER_API_KEY = os.getenv("SCRAPER_API_KEY")
 
 
 def fetch_html(url):

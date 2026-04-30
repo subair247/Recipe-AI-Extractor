@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const API_URL = "https://recipe-ai-extractor-1.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const RecipeForm = (props) => {
   const [url, setUrl] = useState("");
