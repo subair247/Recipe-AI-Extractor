@@ -4,6 +4,7 @@
 
 :root {
   --primary-blue: #2563eb;
+  --bg-gray: #f9fafb;
 }
 
 body {
@@ -11,10 +12,80 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb;
+  background-color: var(--bg-gray);
 }
 
-/* Custom Animation for a professional manual feel */
+/* --- Form Layout (Fixes the Overlap) --- */
+.form-container form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+.form-container input {
+  flex: 1; /* Makes input take available space */
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-container input:focus {
+  border-color: var(--primary-blue);
+  ring: 2px var(--primary-blue);
+}
+
+.form-container button {
+  min-width: 160px; /* Prevents button from jumping when text changes */
+  padding: 12px 24px;
+  background-color: var(--primary-blue);
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-container button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+/* --- Loading & Spinner States --- */
+.loading-btn {
+  background-color: #64748b !important; /* Slate gray for loading */
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.spinner-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner-text::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* --- Animations --- */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -24,7 +95,7 @@ body {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Custom scrollbar for the Modal */
+/* --- Scrollbar Styling --- */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -40,33 +111,4 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-.loading-btn {
-    background-color: #6c757d !important;
-    cursor: not-allowed;
-    position: relative;
-}
-
-.spinner-text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-/* Optional: Adding a small rotating circle */
-.spinner-text::before {
-    content: "";
-    width: 14px;
-    height: 14px;
-    border: 2px solid #ffffff;
-    border-top: 2px solid transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
