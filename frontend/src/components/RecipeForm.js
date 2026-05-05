@@ -18,31 +18,34 @@ const RecipeForm = ({ setRecipes }) => {
     };
 
     const handleExtract = async (e) => {
-        if (e) e.preventDefault();
-        if (!url) return;
+  e.preventDefault();
 
-        setLoading(true);
+  if (!query.trim()) {
+    alert("Enter recipe name");
+    return;
+  }
 
-        try {
-            const response = await axios.post(
-                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-                { url },
-                { timeout: 60000 }
-            );
-            
-            // If server returns data OR the 'No recipe found' error, we show the card
-            if (response.data && !response.data.error) {
-                setRecipes(response.data);
-            } else {
-                triggerFallback();
-            }
-        } catch (error) {
-            // Force the card to show even if the network or backend fails
-            triggerFallback();
-        } finally {
-            setLoading(false);
-        }
-    };
+  setLoading(true);
+
+  try {
+    const response = await axios.post(
+      `${API_URL}/extract-recipe`,
+      { url: query }
+    );
+
+    if (response.data && !response.data.error) {
+      onExtractionSuccess(response.data);
+    } else {
+      alert(response.data.error || "No recipe found");
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to fetch recipe");
+  } finally {
+    setLoading(false);
+  }
+};
 
     return (
         <div className="form-container">
