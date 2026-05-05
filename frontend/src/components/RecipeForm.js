@@ -5,9 +5,10 @@ const RecipeForm = ({ onExtractionSuccess }) => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ API URL from env
-  const API_URL = import.meta.env.VITE_API_URL;
-  console.log(process.env.REACT_APP_API_URL);
+  // ✅ Correct env for CRA
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  console.log("API URL:", API_URL); // debug
 
   const handleExtract = async (e) => {
     e.preventDefault();
@@ -21,9 +22,17 @@ const RecipeForm = ({ onExtractionSuccess }) => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/extract-recipe`,
-        { url: query }
+        `${API_URL}/extract-recipe`, // ✅ correct endpoint
+        { url: query },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 30000,
+        }
       );
+
+      console.log("API RESPONSE:", response.data);
 
       if (response.data && !response.data.error) {
         onExtractionSuccess(response.data);
