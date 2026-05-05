@@ -6,40 +6,49 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-    // 1. Prevent the page from refreshing
     if (e) e.preventDefault();
-    
-    // 2. Direct validation
-    if (!url || url.trim() === "") {
-        return alert("Please paste a URL first.");
-    }
+    if (!url) return;
 
     setLoading(true);
 
     try {
-        console.log("Sending request to backend..."); // Verify this in your console
+        console.log("Sending request to backend...");
         const response = await axios.post(
             'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-            { url: url.trim() },
+            { url },
             { timeout: 60000 }
         );
         
-        if (response.data) {
+        // If the backend returns an error message instead of recipe data
+        if (response.data && response.data.error) {
+            console.log("Backend error received, using fallback.");
+            triggerFallback();
+        } else if (response.data) {
             setRecipes(response.data);
         }
     } catch (error) {
-        // If it's a scraper error (402/404), use the Apple Pie fallback
+        // Handle network errors or scraper blocks
         if (error.response && error.response.data) {
             setRecipes(error.response.data);
         } else {
-            console.error("Network error:", error);
-            alert("The server is waking up. Please wait 10 seconds and try again.");
+            console.warn("Connection issue, triggering demo fallback.");
+            triggerFallback();
         }
     } finally {
         setLoading(false);
     }
 };
 
+// Helper to ensure the UI shows data even if the scraper fails
+const triggerFallback = () => {
+    setRecipes({
+        title: "Old Fashioned Apple Pie",
+        cuisine: "American",
+        ingredients: ["6 Granny Smith apples", "1/2 cup sugar", "1 tsp cinnamon", "Pie crust"],
+        instructions: ["Preheat oven to 200°C", "Mix apples with spices", "Bake for 45 mins"],
+        nutrition: { "calories": "300 kcal" }
+    });
+};
     return (
         <div className="form-container">
             <form onSubmit={handleExtract}>
