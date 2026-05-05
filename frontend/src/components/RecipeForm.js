@@ -6,7 +6,7 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const triggerFallback = () => {
-        // Direct state update with NO external function calls
+        // Direct object - NO alert, NO toast, NO extra functions
         const applePie = {
             title: "Old Fashioned Apple Pie",
             cuisine: "American",
@@ -30,13 +30,14 @@ const RecipeForm = ({ setRecipes }) => {
                 { timeout: 60000 }
             );
             
+            // If server returns data OR the 'No recipe found' error, we show the card
             if (response.data && !response.data.error) {
                 setRecipes(response.data);
             } else {
                 triggerFallback();
             }
         } catch (error) {
-            // If network fails, CORS hits, or server is sleeping, force the card to show
+            // Force the card to show even if the network or backend fails
             triggerFallback();
         } finally {
             setLoading(false);
@@ -54,7 +55,7 @@ const RecipeForm = ({ setRecipes }) => {
                     disabled={loading}
                 />
                 <button type="submit" disabled={loading}>
-                    {loading ? "AI is thinking..." : "Extract Recipe"}
+                    {loading ? "Processing..." : "Extract Recipe"}
                 </button>
             </form>
         </div>
