@@ -6,31 +6,39 @@ const RecipeForm = ({ setRecipes }) => {
     const [loading, setLoading] = useState(false);
 
     const handleExtract = async (e) => {
-        e.preventDefault();
-        if (!url) return;
+    // 1. Prevent the page from refreshing
+    if (e) e.preventDefault();
+    
+    // 2. Direct validation
+    if (!url || url.trim() === "") {
+        return alert("Please paste a URL first.");
+    }
 
-        setLoading(true);
+    setLoading(true);
 
-        try {
-            const response = await axios.post(
-                'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
-                { url },
-                { timeout: 60000 }
-            );
-            
-            if (response && response.data) {
-                setRecipes(response.data);
-            }
-        } catch (error) {
-            if (error.response && error.response.data) {
-                setRecipes(error.response.data);
-            } else {
-                console.log("Connection check...");
-            }
-        } finally {
-            setLoading(false);
+    try {
+        console.log("Sending request to backend..."); // Verify this in your console
+        const response = await axios.post(
+            'https://recipe-ai-extractor-1.onrender.com/extract-recipe', 
+            { url: url.trim() },
+            { timeout: 60000 }
+        );
+        
+        if (response.data) {
+            setRecipes(response.data);
         }
-    };
+    } catch (error) {
+        // If it's a scraper error (402/404), use the Apple Pie fallback
+        if (error.response && error.response.data) {
+            setRecipes(error.response.data);
+        } else {
+            console.error("Network error:", error);
+            alert("The server is waking up. Please wait 10 seconds and try again.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="form-container">
