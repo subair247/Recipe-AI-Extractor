@@ -1,31 +1,97 @@
-# RecipeAI Extractor & History Dashboard 🍳
+🍳 RecipeAI Extractor & Dashboard
+A full-stack web application that extracts and displays structured recipe data from user input, built as a Final Year Project. The system focuses on reliability, clean UI, and seamless frontend–backend integration.
 
-A sophisticated Full-Stack application developed as a **Final Year Project**. This tool leverages Artificial Intelligence and Natural Language Processing (NLP) to scrape raw recipe data from any website and convert it into a structured, user-friendly dashboard.
+🌟 Key Features
 
-## 🌟 Key Features
-- **Dynamic AI Extraction**: Integrates Google Gemini 1.5 Flash to intelligently identify ingredients and instructions from unstructured web text.
-- **Robust Fallback Mechanism**: Features an Intelligent Mock System that ensures 100% UI stability by detecting URL keywords (e.g., "cookie", "rice") and providing high-fidelity data even during API downtime.
-- **Real-Time History Management**: A dedicated history tab to track, store, and revisit previously extracted recipes using React state management.
-- **Modern UI/UX**: A clean, responsive interface built with React and custom CSS, featuring interactive modals and loading states.
 
-## 🛠️ Tech Stack
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | React.js, Tailwind CSS / Custom CSS |
-| **Backend** | FastAPI (Python 3.12+) |
-| **AI/LLM** | Google Gemini 1.5 Flash, LangChain |
-| **Scraping** | BeautifulSoup4, Requests |
-| **Deployment** | Vercel / Render |
+Recipe Extraction via API
+Fetches structured recipe data (ingredients, instructions, images) using a stable backend API integration.
 
-## 🚀 Installation & Setup
 
-### 1. Backend Setup (FastAPI)
-```bash
-cd backend
-python -m venv venv
-# Windows:
-.\venv\Scripts\activate
-# Install dependencies:
-pip install fastapi uvicorn langchain-google-genai beautifulsoup4 requests
-# Start the server:
-uvicorn app.main:app --reload
+End-to-End Full Stack Flow
+React frontend communicates with a FastAPI backend deployed on cloud platforms.
+
+
+Dynamic UI Rendering
+Displays recipes with ingredients, step-by-step instructions, and images in real-time.
+
+
+History Tracking (Frontend State)
+Stores previously fetched recipes during the session for quick access.
+
+
+Responsive UI
+Clean and user-friendly interface built with React and Tailwind CSS.
+
+
+
+🛠️ Tech Stack
+LayerTechnologyFrontendReact.js, Tailwind CSSBackendFastAPI (Python)API IntegrationExternal Recipe APIDeploymentVercel (Frontend), Render (Backend)
+
+🚀 Live Demo
+
+
+Frontend: (your Vercel link)
+
+
+Backend API: (your Render link)
+
+
+
+⚙️ Installation & Setup
+Backend (FastAPI)
+cd backendpython -m venv venv# Windowsvenv\Scripts\activatepip install -r requirements.txtuvicorn app.main:app --reload
+
+Frontend (React)
+cd frontendnpm installnpm start
+
+🔐 Environment Variables
+Frontend (.env)
+REACT_APP_API_URL=https://your-backend-url.onrender.com
+
+📌 Limitations
+
+
+Relies on external API → limited dataset
+
+
+No database persistence (history resets on refresh)
+
+
+Scraper-based extraction is not fully reliable (experimental)
+
+
+
+🚧 Future Improvements
+
+
+Add database (MongoDB / PostgreSQL)
+
+
+Hybrid system (API + scraper fallback)
+
+
+Improved NLP-based extraction
+
+
+User authentication & saved recipes
+
+
+
+🧠 Why this version is better
+
+
+✔ Honest (huge for recruiters)
+
+
+✔ Matches your actual working system
+
+
+✔ Shows deployment + architecture skills
+
+
+✔ Doesn’t overclaim AI
+
+
+
+
